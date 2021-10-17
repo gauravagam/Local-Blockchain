@@ -1,4 +1,4 @@
-class TXO{
+class UTXO{
     constructor(owner,amount){
         this.owner = owner;
         this.amount = amount;
@@ -6,4 +6,4 @@ class TXO{
     }
 }
 
-module.exports = TXO;
+module.exports = UTXO;

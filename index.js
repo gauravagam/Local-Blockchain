@@ -3,7 +3,7 @@ const app = express();
 const { PORT } = require('./config');
 
 const db = require('./db');
-const TXO = require('./models/TXO');
+const UTXO = require('./models/TXO');
 require('./generate');
 const {mine, startMining, stopMining} = require('./mine');
 
@@ -24,15 +24,24 @@ app.post("/transaction",async(req,res)=>{
 });
 
 app.get("/getBalance/:address",async(req,res)=>{
-    
+    const { address } = req.params;
+    let balance = getBalance(address);
+    res.json({message:`balance of ${address} is ${balance}`});
 });
 
 const addTransaction= (txo)=>{
-    const txoObj = new TXO(txo.owner, txo.amount);
+    const txoObj = new UTXO(txo.owner, txo.amount);
     db.mempool.push(txoObj);
     console.log('transaction added in mempool ',db.mempool.length);
 }
 
+const getBalance = (address) =>{
+    const ourUTXOs = db.utxos.filter(x => {
+        return x.owner === address && !x.spent;
+      });
+    const sum = ourUTXOs.reduce((p,c) => p + c.amount, 0);
+    return sum;
+}
 app.listen(PORT, () => {
     console.log(`Listening on port ${PORT}!`);
 });

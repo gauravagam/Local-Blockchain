@@ -22,11 +22,13 @@ function mine() {
         ? db.mempool.splice(0, MAX_TRANSACTIONS) : db.mempool.splice(0, db.mempool.length);
     if(transactions.length>0){
         let transaction = new Transaction([],[...transactions]);
-        let blockObj = new Block(transaction);
+        let blockObj = new Block();
+        blockObj.addTransactions(transaction);
         
         while(BigInt(`0x${blockObj.hash()}`) > TARGET_DIFFICULTY){
             blockObj.nonce+=1;
         }
+        blockObj.execute();
         console.log(`mined block #${db.blockchain.getBlockHeight()}`);
         db.blockchain.addBlock(blockObj);
     }
